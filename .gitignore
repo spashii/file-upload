@@ -2,10 +2,3 @@
 npm-debug.log
 .DS_Store
 /*.env
-
-static/*
-!static/.gitkeep
-tmp/*
-!tmp/.gitkeep
-
-

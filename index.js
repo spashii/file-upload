@@ -14,6 +14,9 @@ app.use('/file', express.static('static'));
 app.use(
   fileUpload({
     useTempFiles: true,
+    limits: {
+      fileSize: 10 * 1024 * 1024
+    },
   })
 );
 
