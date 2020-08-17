@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const fileUpload = require('express-fileupload');
@@ -8,6 +9,7 @@ const app = express();
 
 const PORT = process.env.PORT;
 
+app.use(cors());
 app.use('/file', express.static('static'));
 app.use(
   fileUpload({
@@ -38,8 +40,10 @@ app.post('/files', (req, res) => {
   }
   let file = req.files.file;
   const identifier = cryptoRandomString({ length: 10, type: 'url-safe' });
-  const extension = file.name.slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2);
-  const filename = extension.length ? identifier+'.'+extension : identifier
+  const extension = file.name.slice(
+    ((file.name.lastIndexOf('.') - 1) >>> 0) + 2
+  );
+  const filename = extension.length ? identifier + '.' + extension : identifier;
   file.mv(`static/${identifier}.${extension}`, (err) => {
     if (err) return res.status(500).send(err);
     else {
