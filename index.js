@@ -7,7 +7,9 @@ const cryptoRandomString = require('crypto-random-string');
 
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 25002;
+// max file upload size in MB
+const MAX_FILE_UPLOAD_SIZE = process.env.MAX_FILE_UPLOAD_SIZE || 10
 
 app.use(cors());
 app.use('/file', express.static('static'));
@@ -15,7 +17,7 @@ app.use(
   fileUpload({
     useTempFiles: true,
     limits: {
-      fileSize: 10 * 1024 * 1024
+      fileSize: MAX_FILE_UPLOAD_SIZE * 1024 * 1024,
     },
   })
 );
