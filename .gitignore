@@ -3,7 +3,7 @@ npm-debug.log
 .DS_Store
 /*.env
 
-static/*
-!static/.gitkeep
+files/*
+!files/.gitkeep
 tmp/*
 !tmp/.gitkeep

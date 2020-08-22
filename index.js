@@ -5,14 +5,14 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 const cryptoRandomString = require('crypto-random-string');
 
+const PORT = process.env.PORT || 3000;
+const MAX_FILE_UPLOAD_SIZE = process.env.MAX_FILE_UPLOAD_SIZE || 10;
+const FILES_DIRNAME = process.env.FILES_DIRNAME || 'files';
+
 const app = express();
-
-const PORT = process.env.PORT || 25002;
-// max file upload size in MB
-const MAX_FILE_UPLOAD_SIZE = process.env.MAX_FILE_UPLOAD_SIZE || 10
-
 app.use(cors());
-app.use('/file', express.static('static'));
+
+app.use('/file', express.static(FILES_DIRNAME));
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -22,8 +22,15 @@ app.use(
   })
 );
 
+// serving react
+app.use(express.static('frontend/build'));
+app.use('/static', express.static('frontend/build/static'));
+app.get('/', (req, res) => {
+  res.sendFile('frontend/build/index.html');
+});
+
 app.get('/files', (req, res) => {
-  const filesDir = path.join(__dirname, 'static');
+  const filesDir = path.join(__dirname, FILES_DIRNAME);
   fs.readdir(filesDir, (err, files) => {
     if (err) {
       res.status(500).send(err);
@@ -49,7 +56,7 @@ app.post('/files', (req, res) => {
     ((file.name.lastIndexOf('.') - 1) >>> 0) + 2
   );
   const filename = extension.length ? identifier + '.' + extension : identifier;
-  file.mv(`static/${identifier}.${extension}`, (err) => {
+  file.mv(`${FILES_DIRNAME}/${identifier}.${extension}`, (err) => {
     if (err) return res.status(500).send(err);
     else {
       res.json({
