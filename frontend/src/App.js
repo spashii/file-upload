@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 const App = () => {
@@ -14,8 +14,10 @@ const App = () => {
     }
   });
   const [selectedFile, setSelectedFile] = useState(null);
-  const [resultPath, setResultPath] = useState('');
   const [waiting, setWaiting] = useState(false);
+  const [resultPath, setResultPath] = useState('');
+  const [copied, setCopied] = useState(false);
+  const resultRef = useRef(null);
 
   const onBaseUrlChange = (event) => {
     setBaseUrl(event.target.value);
@@ -27,11 +29,18 @@ const App = () => {
     setBaseUrlSaved(true);
   };
 
+  const copyToClipboard = () => {
+    resultRef.current.select();
+    document.execCommand('copy');
+    setCopied(true);
+  };
+
   const onFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
 
-  const onFileUpload = () => {
+  const onFileUpload = (event) => {
+    setCopied(false);
     setWaiting(true);
     let data = new FormData();
     data.append('file', selectedFile);
@@ -41,6 +50,7 @@ const App = () => {
         console.log(res);
         setWaiting(false);
         setResultPath(baseUrl + res.data.path);
+        copyToClipboard(event);
       })
       .catch((err) => {
         console.log(err);
@@ -60,8 +70,23 @@ const App = () => {
           <div className="col-md-8">
             {resultPath ? (
               <div className="pb-2 mb-4 border-bottom">
-                <a target="_blank" rel="noopener noreferrer" href={resultPath}>
-                  {resultPath}
+                {copied && (
+                  <p className="text-small text-success mb-2">
+                    Copied to clipboard!
+                  </p>
+                )}
+                <textarea
+                  ref={resultRef}
+                  defaultValue={resultPath}
+                  className="form-control"
+                ></textarea>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={resultPath}
+                  className="btn btn-info mt-2"
+                >
+                  link
                 </a>
               </div>
             ) : (
